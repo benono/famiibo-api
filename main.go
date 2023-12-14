@@ -22,7 +22,7 @@ func main() {
 	userController := controller.NewUserController(userUsecase)
 	taskController := controller.NewTaskController(taskUsecase)
 	e := router.NewRouter(userController, taskController)
-	e.Logger.Fatal(e.Start(":8089"))
+	e.Logger.Fatal(e.Start(":8080"))
 	floatVal, _ := strconv.ParseFloat("", 64)
 	fmt.Println(floatVal)
 }
