@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(uc controller.IUserController, pc controller.IPayeeController, ac controller.IAccountController) *echo.Echo {
+func NewRouter(uc controller.IUserController, pc controller.IPayeeController, ac controller.IAccountController, cc controller.ICategoryController) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000", "http://localhost:3001", os.Getenv("FE_URL")},
@@ -54,6 +54,14 @@ func NewRouter(uc controller.IUserController, pc controller.IPayeeController, ac
 	p.POST("", pc.Create)
 	p.PUT("/:payeeId", pc.Update)
 	p.DELETE("/:payeeId", pc.Delete)
+
+	// Categories
+	c := e.Group("/categories")
+	c.GET("", cc.FindAll)
+	c.GET("/:categoryId", cc.FindById)
+	c.POST("", cc.Create)
+	c.PUT("/:categoryId", cc.Update)
+	c.DELETE("/:categoryId", cc.Delete)
 
 	// Stores
 	// s := e.Group("/stores")
