@@ -8,25 +8,23 @@ import (
 	"go-rest-api/router"
 	"go-rest-api/usecase"
 	"go-rest-api/validator"
-	"strconv"
 )
 
 func main() {
+	fmt.Println("Starting Server....ç")
 	db := db.NewDB()
 	userValidator := validator.NewUserValidator()
-	taskValidator := validator.NewTaskValidator()
+	accountValidator := validator.NewAccountValidator()
 	payeeValidator := validator.NewPayeeValidator()
 	userRepository := repository.NewUserRepository(db)
-	taskRepository := repository.NewTaskRepository(db)
+	accountRepository := repository.NewAccountRepository(db)
 	payeeRepository := repository.NewPayeeRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository, userValidator)
-	taskUsecase := usecase.NewTaskUsecase(taskRepository, taskValidator)
+	accountUsecase := usecase.NewAccountUsecase(accountRepository, accountValidator)
 	payeeUsecase := usecase.NewPayeeUsecase(payeeRepository, payeeValidator)
 	userController := controller.NewUserController(userUsecase)
-	taskController := controller.NewTaskController(taskUsecase)
+	accountController := controller.NewAccountController(accountUsecase)
 	payeeController := controller.NewPayeeController(payeeUsecase)
-	e := router.NewRouter(userController, taskController, payeeController)
+	e := router.NewRouter(userController, payeeController, accountController)
 	e.Logger.Fatal(e.Start(":8080"))
-	floatVal, _ := strconv.ParseFloat("", 64)
-	fmt.Println(floatVal)
 }
