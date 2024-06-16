@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(uc controller.IUserController, tc controller.ITaskController, pc controller.IPayeeController) *echo.Echo {
+func NewRouter(uc controller.IUserController, pc controller.IPayeeController, ac controller.IAccountController) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000", "http://localhost:3001", os.Getenv("FE_URL")},
@@ -38,17 +38,29 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController, pc 
 		SigningKey:  []byte(os.Getenv("SECRET")),
 		TokenLookup: "cookie:token", // jwtTokenの格納場所（CookieにTokenという名前で保存）
 	}))
-	t.GET("", tc.GetAllTasks)
-	t.GET("/:taskId", tc.GetTaskById)
-	t.POST("", tc.CreateTask)
-	t.PUT("/:taskId", tc.UpdateTask)
-	t.DELETE("/:taskId", tc.DeleteTask)
 
+	// Accounts
+	a := e.Group("/accounts")
+	a.GET("", ac.FindAll)
+	a.GET("/:accountId", ac.FindById)
+	a.POST("", ac.Create)
+	a.PUT("/:accountId", ac.Update)
+	a.DELETE("/:accountId", ac.Delete)
+
+	// Payees
 	p := e.Group("/payees")
 	p.GET("", pc.FindAll)
 	p.GET("/:payeeId", pc.FindById)
 	p.POST("", pc.Create)
 	p.PUT("/:payeeId", pc.Update)
 	p.DELETE("/:payeeId", pc.Delete)
+
+	// Stores
+	// s := e.Group("/stores")
+	// s.GET("", sc.FindAll)
+	// s.GET("/:storeId", sc.FindById)
+	// s.POST("", sc.Create)
+	// s.PUT("/:storeId", sc.Update)
+	// s.DELETE("/:storeId", sc.Delete)
 	return e
 }
