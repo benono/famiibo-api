@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"os"
 
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(uc controller.IUserController, pc controller.IPayeeController, ac controller.IAccountController, cc controller.ICategoryController) *echo.Echo {
+func NewRouter(uc controller.IUserController, pc controller.IPayeeController, ac controller.IAccountController, cc controller.ICategoryController, tc controller.ITransactionController) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000", "http://localhost:3001", os.Getenv("FE_URL")},
@@ -32,12 +31,11 @@ func NewRouter(uc controller.IUserController, pc controller.IPayeeController, ac
 	e.POST("/logout", uc.LogOut)
 	e.GET("/csrf", uc.CsrfToken)
 
-	t := e.Group("/tasks")
 	// ミドルウェアを追加
-	t.Use(echojwt.WithConfig(echojwt.Config{
-		SigningKey:  []byte(os.Getenv("SECRET")),
-		TokenLookup: "cookie:token", // jwtTokenの格納場所（CookieにTokenという名前で保存）
-	}))
+	// t.Use(echojwt.WithConfig(echojwt.Config{
+	// 	SigningKey:  []byte(os.Getenv("SECRET")),
+	// 	TokenLookup: "cookie:token", // jwtTokenの格納場所（CookieにTokenという名前で保存）
+	// }))
 
 	// Accounts
 	a := e.Group("/accounts")
@@ -63,12 +61,13 @@ func NewRouter(uc controller.IUserController, pc controller.IPayeeController, ac
 	c.PUT("/:categoryId", cc.Update)
 	c.DELETE("/:categoryId", cc.Delete)
 
-	// Stores
-	// s := e.Group("/stores")
-	// s.GET("", sc.FindAll)
-	// s.GET("/:storeId", sc.FindById)
-	// s.POST("", sc.Create)
-	// s.PUT("/:storeId", sc.Update)
-	// s.DELETE("/:storeId", sc.Delete)
+	// Transactions
+	t := e.Group("/transactions")
+	t.GET("", tc.FindAll)
+	t.GET("/:transactionId", tc.FindById)
+	t.POST("", tc.Create)
+	t.PUT("/:transactionId", tc.Update)
+	t.DELETE("/:transactionId", tc.Delete)
+
 	return e
 }
